@@ -6,6 +6,15 @@ lock_file="/tmp/swww/background_changer.lock"
 folder=$1
 delay=$2
 
+mkdir -p "$(dirname "$config_file")"
+mkdir -p "$(dirname "$lock_file")"
+
+# Create the config file if it doesn't exist
+if [ ! -f "$config_file" ]; then
+    echo "Default_Folder" > "$config_file"
+    echo "Default_Delay" >> "$config_file"
+fi
+
 cleanup() {
     if [ $$ -eq $(cat "$lock_file") ]; then
         echo "REMOVED LOCK FILE"
@@ -25,14 +34,6 @@ write_conf() {
     echo "$delay" >> "$config_file"
 }
 
-# test_data() {
-#     echo "folder"
-#     echo "$folder"
-#     echo "delay"
-#     echo "$delay"
-# }
-
-
 if [ $# -eq 2 ]; then
     if [ -f "$lock_file" ]; then
         write_conf
@@ -51,7 +52,6 @@ else
     exit 1
 fi
 
-
 change_background() {
     ~/.scripts/swww/change-background $folder
     #echo "Changing background..."
@@ -63,3 +63,4 @@ while true; do
     change_background
     sleep "$delay"
 done
+
